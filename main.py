@@ -57,13 +57,14 @@ def roundRobin(processos, Quantum):
         while QuantumCounter > 0:
 
             print(f"********** TEMPO {tempo} **************")
-            if(Fila.empty):
+            if(not len(Fila.queue)):
                 print("FILA: Nao ha processos na fila")
             else:
-                print("FILA:")
+                print("FILA:", end=" ")
                 for i in range(len(Fila.queue)):
                     item = Fila.queue[i]
                     print(f"{item}({processos[item][0]})", end=" ")
+                print()
 
             IO += 1
 
