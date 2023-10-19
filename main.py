@@ -43,12 +43,14 @@ def roundRobin(processos, Quantum):
 
     tempo = 0
     IO = 0
+    novoProcesso = False
+    item = ""
     
     Fila = queue.Queue() # Fila CPU
 
     Fila.put(processosFila.get()[0]) # Push primeiro fila de processos
 
-    while(Fila.not_empty): # Enquanto a Fila de CPU não esta vazia
+    while(len(Fila.queue)): # Enquanto a Fila de CPU não esta vazia
 
         QuantumCounter = Quantum
 
@@ -57,6 +59,11 @@ def roundRobin(processos, Quantum):
         while QuantumCounter > 0:
 
             print(f"********** TEMPO {tempo} **************")
+
+            if(novoProcesso):
+                print(f"#[evento] CHEGADA <{item}>")
+                novoProcesso = False
+
             if(not len(Fila.queue)):
                 print("FILA: Nao ha processos na fila")
             else:
@@ -91,15 +98,18 @@ def roundRobin(processos, Quantum):
             QuantumCounter -= 1
             
             if(len(processosFila.queue) and tempo == processosFila.queue[0][1]):
-                Fila.put(processosFila.get()[0])
+                item = processosFila.get()[0]
+                novoProcesso = True
+                Fila.put(item)
         
         if(QuantumCounter == 0):
             Fila.put(P)
+
+    print(f"********** TEMPO {tempo} **************")
+    print("ACABOOOO")
 
 processos = readfile()
 
 Quantum = 4
 
 roundRobin(processos, Quantum)
-
-print("ACABOOOO")
