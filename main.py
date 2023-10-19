@@ -27,13 +27,13 @@ def getFila(processos):
     Fila = queue.Queue()
 
     for i in processos:
-        Fila.put([i, processos[i]])
+        Fila.put([i, processos[i][1]])
 
     return Fila
 
 def roundRobin(processos, Quantum):
 
-    processosFila = getFila(processos)
+    processosFila = getFila(processos) # Fila de processos ainda não chamados
 
     print("""
 -----------------------------------
@@ -44,18 +44,15 @@ def roundRobin(processos, Quantum):
     tempo = 0
     IO = 0
     
-    Fila = queue.Queue()
+    Fila = queue.Queue() # Fila CPU
 
-    Fila.put(processosFila.get())
+    Fila.put(processosFila.get()[0]) # Push primeiro fila de processos
 
-    while(Fila.not_empty):
+    while(Fila.not_empty): # Enquanto a Fila de CPU não esta vazia
 
-        remover = []
         QuantumCounter = Quantum
 
-        P = Fila.get()[0]
-
-        print(P)
+        P = Fila.get() # Pegar o primeiro processo da Fila de CPU
 
         while QuantumCounter > 0:
 
@@ -64,12 +61,14 @@ def roundRobin(processos, Quantum):
                 print("FILA: Nao ha processos na fila")
             else:
                 print("FILA:")
-                for i in range(Fila.qsize):
+                for i in range(len(Fila.queue)):
                     item = Fila.queue[i]
-                    print("{item}({processos[item][0]})", end=" ")
+                    print(f"{item}({processos[item][0]})", end=" ")
 
             IO += 1
 
+            tempo += 1
+            
             processoAtual = processos[P][0]
             
             print(f"CPU: {P}({processoAtual})")
@@ -78,10 +77,10 @@ def roundRobin(processos, Quantum):
 
             if(processoAtual == 0):
                 processos[P][0] = 0
-                remover.append(P)
                 break
-            elif(processos[P][2].queue[0] == IO):
+            elif(len(processos[P][2].queue) and processos[P][2].queue[0] == IO):
                 processos[P][0] = processoAtual
+                
                 Fila.put(P)
                 IO = 0
                 break
@@ -89,21 +88,17 @@ def roundRobin(processos, Quantum):
                 processos[P][0] = processoAtual
 
             QuantumCounter -= 1
-
-            tempo += 1
-
-            if(tempo == processosFila.queue[0]):
-                Fila.put(processosFila.get())
+            
+            if(len(processosFila.queue) and tempo == processosFila.queue[0][1]):
+                Fila.put(processosFila.get()[0])
         
         if(QuantumCounter == 0):
             Fila.put(P)
-
-        removerDic(remover, processos)
-        
-        remover.clear()
 
 processos = readfile()
 
 Quantum = 4
 
 roundRobin(processos, Quantum)
+
+print("ACABOOOO")
