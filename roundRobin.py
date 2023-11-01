@@ -8,11 +8,18 @@ def getFila(processos):
 
     return Fila
 
-def startRoundRobin(processos, Quantum):
+class roundRobin:
+    
+    def __init__(self, process, quantum):
+        self.process = process
+        self.quantum = quantum
+        self.listProcess = [
+            
+        ]
 
-    processosFila = getFila(processos) # Fila de processos ainda não chamados
+    def start(self):
 
-    print("""
+        print("""
 ***********************************
 ***** ESCALONADOR ROUND ROBIN *****
 -----------------------------------
@@ -20,94 +27,97 @@ def startRoundRobin(processos, Quantum):
 -----------------------------------
     """)
 
-    tempo = 0
-    newProcess = False
-    IOProcess = False
-    EndProcess = False
-    quitProcess = False
-    quantumProcess = False
-    item = ""
-    novo = ""
-    quantumP = ""
-    
-    Fila = queue.Queue() # Fila CPU
+        processQueue = getFila(self.process) # Fila de processos ainda não chamados
 
-    Fila.put(processosFila.get()[0]) # Push primeiro fila de processos
-
-    while(True): # Enquanto a Fila de CPU não esta vazia
-
-        if(len(Fila.queue) == 0 and len(processosFila.queue) == 0):
-            quitProcess = True
-        else:
-            QuantumCounter = Quantum
-
-            P = Fila.get() # Pegar o primeiro processo da Fila de CPU
-
-        while QuantumCounter > 0:
-
-            print(f"********** TEMPO {tempo} **************")
-
-            if(IOProcess):
-                print(f"#[evento] OPERACAO I/O <{item}>")
-                IOProcess = False
-            if(quantumProcess):
-                print(f"#[evento] FIM QUANTUM <{quantumP}>")
-                quantumProcess = False
-            if(newProcess):
-                print(f"#[evento] CHEGADA <{novo}>")
-                Fila.put(novo)
-                newProcess = False
-            if(EndProcess):
-                print(f"#[evento] ENCERRANDO <{item}>")
-                EndProcess = False
-
-            if(not len(Fila.queue)):
-                print("FILA: Nao ha processos na fila")
-                if(quitProcess):
-                    break
-            else:
-                print("FILA:", end=" ")
-                for i in range(len(Fila.queue)):
-                    item = Fila.queue[i]
-                    print(f"{item}({processos[item][0]})", end=" ")
-                print()
-
-            processos[P][3] += 1
-
-            tempo += 1
-            
-            processoAtual = processos[P][0]
-            
-            print(f"CPU: {P}({processoAtual})")
-
-            processoAtual -= 1
-
-            if(len(processosFila.queue) and tempo == processosFila.queue[0][1]):
-                novo = processosFila.get()[0]
-                newProcess = True
-
-            if(processoAtual == 0):
-                processos[P][0] = 0
-                EndProcess = True
-                item = P
-                break
-            elif(len(processos[P][2].queue) and len(processos[P][2].queue) and processos[P][2].queue[0] == processos[P][3]):
-                processos[P][2].get()
-                item = P
-                processos[P][0] = processoAtual
-                Fila.put(P)
-                IOProcess = True
-                break
-            else:
-                processos[P][0] = processoAtual
-
-            QuantumCounter -= 1
+        timeProcess = 0 # <int> loop time
+        newProcess = False
+        IOProcess = False
+        endProcess = False
+        quitProcess = False
+        quantumProcess = False
+        item = ""
+        novo = ""
+        quantumP = ""
         
-        if(QuantumCounter == 0):
-            quantumP = P
-            Fila.put(P)
-            quantumProcess = True
+        Fila = queue.Queue() # Fila CPU
 
-        if(quitProcess):
-            print("ACABARAM OS PROCESSOS!!!")
-            break
+        Fila.put(processQueue.get()[0]) # Push primeiro fila de processos
+
+        while(True): # Enquanto a Fila de CPU não esta vazia
+
+            if(len(Fila.queue) == 0 and len(processQueue.queue) == 0):
+                quitProcess = True
+            else:
+                QuantumCounter = self.quantum
+
+                P = Fila.get() # Pegar o primeiro processo da Fila de CPU
+
+            while QuantumCounter > 0:
+
+                print(f"********** TEMPO {timeProcess} **************")
+
+                
+                if(IOProcess):
+                    print(f"#[evento] OPERACAO I/O <{item}>")
+                    IOProcess = False
+                if(quantumProcess):
+                    print(f"#[evento] FIM QUANTUM <{quantumP}>")
+                    quantumProcess = False
+                if(newProcess):
+                    print(f"#[evento] CHEGADA <{novo}>")
+                    Fila.put(novo)
+                    newProcess = False
+                if(endProcess):
+                    print(f"#[evento] ENCERRANDO <{item}>")
+                    endProcess = False
+
+                if(not len(Fila.queue)):
+                    print("FILA: Nao ha processos na fila")
+                    if(quitProcess):
+                        break
+                else:
+                    print("FILA:", end=" ")
+                    for i in range(len(Fila.queue)):
+                        item = Fila.queue[i]
+                        print(f"{item}({self.process[item][0]})", end=" ")
+                    print()
+
+                self.process[P][3] += 1
+
+                timeProcess += 1
+                
+                processoAtual = self.process[P][0]
+                
+                print(f"CPU: {P}({processoAtual})")
+
+                processoAtual -= 1
+
+                if(len(processQueue.queue) and timeProcess == processQueue.queue[0][1]):
+                    novo = processQueue.get()[0]
+                    newProcess = True
+
+                if(processoAtual == 0):
+                    self.process[P][0] = 0
+                    endProcess = True
+                    item = P
+                    break
+                elif(len(self.process[P][2].queue) and len(self.process[P][2].queue) and self.process[P][2].queue[0] == self.process[P][3]):
+                    self.process[P][2].get()
+                    item = P
+                    self.process[P][0] = processoAtual
+                    Fila.put(P)
+                    IOProcess = True
+                    break
+                else:
+                    self.process[P][0] = processoAtual
+
+                QuantumCounter -= 1
+            
+            if(QuantumCounter == 0):
+                quantumP = P
+                Fila.put(P)
+                quantumProcess = True
+
+            if(quitProcess):
+                print("ACABARAM OS PROCESSOS!!!")
+                break
