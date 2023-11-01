@@ -1,8 +1,10 @@
 from importFile import readfile
-from roundRobin import startRoundRobin
+from roundRobin import roundRobin
 
 processos = readfile()
 
 Quantum = 4
 
-startRoundRobin(processos, Quantum)
+rr = roundRobin(processos, Quantum)
+
+rr.start()
